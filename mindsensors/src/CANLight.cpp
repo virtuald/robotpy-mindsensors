@@ -6,6 +6,8 @@
 using std::string;
 #include <math.h>
 
+#include <frc/Errors.h>
+
 using namespace mindsensors;
 
 /**
@@ -42,11 +44,11 @@ string CANLight::GetLibraryVersion() {
  * </a>. Devices will ship with a factory default CAN ID of 3. Please use a
  * unique ID for each device.
  */
-CANLight::CANLight(uint8_t deviceNumber) {
+CANLight::CANLight(uint8_t deviceNumber)  : m_deviceID(deviceNumber) {
     if (deviceNumber > 60 || deviceNumber < 1) throw std::invalid_argument("Device number must be between 1 and 60.");
 	int32_t status = 0;
 	int handle = CANLight_Constructor(deviceNumber, &status);
-    if (status != 0) wpi_setError(status);
+    FRC_CheckErrorStatus(status, "CAN ID {}", m_deviceID);
     m_handle = handle;
 }
 
@@ -56,7 +58,7 @@ CANLight::CANLight(uint8_t deviceNumber) {
 uint8_t CANLight::GetDeviceID() const {
 	int32_t status = 0;
 	uint8_t retVal = CANLight_GetDeviceID(m_handle, &status);
-	if (status != 0) wpi_setError(status);
+	FRC_CheckErrorStatus(status, "CAN ID {}", m_deviceID);
 	return retVal;
 }
 /**
@@ -67,7 +69,7 @@ uint8_t CANLight::GetDeviceID() const {
 string CANLight::GetDeviceName() const {
 	int32_t status = 0;
 	const char* retVal = CANLight_GetDeviceName(m_handle, &status);
-	if (status != 0) wpi_setError(status);
+	FRC_CheckErrorStatus(status, "CAN ID {}", m_deviceID);
 	return retVal;
 }
 /**
@@ -79,7 +81,7 @@ string CANLight::GetDeviceName() const {
 string CANLight::GetFirmwareVersion() const {
 	int32_t status = 0;
 	const char* retVal = CANLight_GetFirmwareVersion(m_handle, &status);
-	if (status != 0) wpi_setError(status);
+	FRC_CheckErrorStatus(status, "CAN ID {}", m_deviceID);
 	return retVal;
 }
 /**
@@ -89,7 +91,7 @@ string CANLight::GetFirmwareVersion() const {
 string CANLight::GetHardwareVersion() const {
 	int32_t status = 0;
 	const char* retVal = CANLight_GetHardwareVersion(m_handle, &status);
-	if (status != 0) wpi_setError(status);
+	FRC_CheckErrorStatus(status, "CAN ID {}", m_deviceID);
 	return retVal;
 }
 /**
@@ -99,7 +101,7 @@ string CANLight::GetHardwareVersion() const {
 string CANLight::GetBootloaderVersion() const {
 	int32_t status = 0;
 	const char* retVal = CANLight_GetBootloaderVersion(m_handle, &status);
-	if (status != 0) wpi_setError(status);
+	FRC_CheckErrorStatus(status, "CAN ID {}", m_deviceID);
 	return retVal;
 }
 /**
@@ -109,7 +111,7 @@ string CANLight::GetBootloaderVersion() const {
 string CANLight::GetSerialNumber() const {
 	int32_t status = 0;
 	const char* retVal = CANLight_GetSerialNumber(m_handle, &status);
-	if (status != 0) wpi_setError(status);
+	FRC_CheckErrorStatus(status, "CAN ID {}", m_deviceID);
 	return retVal;
 }
 
@@ -125,7 +127,7 @@ void CANLight::BlinkLED(uint8_t seconds) {
 	int32_t status = 0;
   if (seconds == 0) seconds = 1;
 	CANLight_BlinkLED(m_handle, seconds, &status);
-	if (status != 0) wpi_setError(status);
+	FRC_CheckErrorStatus(status, "CAN ID {}", m_deviceID);
 }
 
 /**
@@ -143,7 +145,7 @@ void CANLight::BlinkLED(uint8_t seconds) {
 void CANLight::ShowRGB(uint8_t red, uint8_t green, uint8_t blue) {
 	int32_t status = 0;
 	CANLight_ShowRGB(m_handle, red, green, blue, &status);
-	if (status != 0) wpi_setError(status);
+	FRC_CheckErrorStatus(status, "CAN ID {}", m_deviceID);
 }
 
 /**
@@ -174,7 +176,7 @@ void CANLight::WriteRegister(uint8_t index, double time, uint8_t red, uint8_t gr
     //if (centiseconds > 255) centiseconds = 255; // centiseconds already uint8_t
   int32_t status = 0;
 	CANLight_WriteRegister(m_handle, index, centiseconds, red, green, blue, &status);
-	if (status != 0) wpi_setError(status);
+	FRC_CheckErrorStatus(status, "CAN ID {}", m_deviceID);
 }
 
 /**
@@ -184,7 +186,7 @@ void CANLight::WriteRegister(uint8_t index, double time, uint8_t red, uint8_t gr
 void CANLight::Reset() {
 	int32_t status = 0;
 	CANLight_Reset(m_handle, &status);
-	if (status != 0) wpi_setError(status);
+	FRC_CheckErrorStatus(status, "CAN ID {}", m_deviceID);
 }
 
 /**
@@ -198,7 +200,7 @@ void CANLight::ShowRegister(uint8_t index) {
     if (index > 7) throw std::out_of_range("Index must be between 0 and 7.");
 	int32_t status = 0;
 	CANLight_ShowRegister(m_handle, index, &status);
-	if (status != 0) wpi_setError(status);
+	FRC_CheckErrorStatus(status, "CAN ID {}", m_deviceID);
 }
 
 /**
@@ -212,7 +214,7 @@ void CANLight::Flash(uint8_t index) {
     if (index > 7) throw std::out_of_range("Index must be between 0 and 7.");
 	int32_t status = 0;
 	CANLight_Flash(m_handle, index, &status);
-	if (status != 0) wpi_setError(status);
+	FRC_CheckErrorStatus(status, "CAN ID {}", m_deviceID);
 }
 
 /**
@@ -232,7 +234,7 @@ void CANLight::Cycle(uint8_t fromIndex, uint8_t toIndex) {
     }
 	int32_t status = 0;
 	CANLight_Cycle(m_handle, fromIndex, toIndex, &status);
-	if (status != 0) wpi_setError(status);
+	FRC_CheckErrorStatus(status, "CAN ID {}", m_deviceID);
 }
 
 /**
@@ -255,7 +257,7 @@ void CANLight::Fade(uint8_t startIndex, uint8_t endIndex) {
     }
 	int32_t status = 0;
 	CANLight_Fade(m_handle, startIndex, endIndex, &status);
-	if (status != 0) wpi_setError(status);
+	FRC_CheckErrorStatus(status, "CAN ID {}", m_deviceID);
 }
 
 /**
@@ -267,6 +269,6 @@ void CANLight::Fade(uint8_t startIndex, uint8_t endIndex) {
 double CANLight::GetBatteryVoltage() const {
     int32_t status = 0;
 	double retVal = CANLight_GetBatteryVoltage(m_handle, &status);
-	if (status != 0) wpi_setError(status);
+	FRC_CheckErrorStatus(status, "CAN ID {}", m_deviceID);
     return retVal;
 }

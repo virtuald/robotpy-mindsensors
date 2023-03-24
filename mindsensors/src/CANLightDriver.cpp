@@ -8,8 +8,9 @@ using std::string;
 
 #include <unistd.h> /* for usleep */
 
-#include "FRC_NetworkCommunication/UsageReporting.h"
-#include "HAL/handles/IndexedClassedHandleResource.h"
+#include "hal/FRCUsageReporting.h"
+#include "hal/handles/IndexedClassedHandleResource.h"
+#include "hal/CAN.h"
 
 using namespace mindsensors;
 
@@ -37,7 +38,7 @@ CANLightDriver::CANLightDriver(int8_t deviceNumber, int32_t* status) {
     
     // get name
     requestMessage(MSR_DEVNAME | m_deviceID, data, &dataSize, timeoutMs, status);
-    if (*status != ERR_CANSessionMux_MessageNotFound) {
+    if (*status != HAL_ERR_CANSessionMux_MessageNotFound) {
         m_deviceName = "";
         for (int i = 0; i < dataSize; i++) {
             if (data[i] == 0) break;
@@ -53,7 +54,7 @@ CANLightDriver::CANLightDriver(int8_t deviceNumber, int32_t* status) {
     // get firmware, hardware, bootloader versions
     if (!failedToGetMessage) {
         requestMessage(MSR_FIRMWARE_VERSION | m_deviceID, data, &dataSize, timeoutMs, status);
-        if (*status != ERR_CANSessionMux_MessageNotFound) {
+        if (*status != HAL_ERR_CANSessionMux_MessageNotFound) {
             m_firmwareVersion   = std::to_string(data[0]) + "." + std::to_string(data[1]);
             m_hardwareVersion   = std::to_string(data[2]) + "." + std::to_string(data[3]);
             m_bootloaderVersion = std::to_string(data[4]) + "."	+ std::to_string(data[5]);
@@ -63,7 +64,7 @@ CANLightDriver::CANLightDriver(int8_t deviceNumber, int32_t* status) {
     // get serial number
     if (!failedToGetMessage) {
         requestMessage(MSR_DEVSERNO | m_deviceID, data, &dataSize, timeoutMs, status);
-        if (*status != ERR_CANSessionMux_MessageNotFound) {
+        if (*status != HAL_ERR_CANSessionMux_MessageNotFound) {
             m_serialNumber = "";
             for (int i = 0; i < dataSize; i++) {
                 if (data[i] == 0) break;
@@ -161,7 +162,7 @@ void CANLightDriver::BlinkLED(uint8_t seconds, int32_t* status) {
 
     sendMessage(MSR_BLINK | m_deviceID, data, 1, status);
     
-    if (*status == ERR_CANSessionMux_MessageNotFound) {fprintf(stderr, "Warning: CANLight with ID %d not found. Call to BlinkLED failed.\n", m_deviceID); *status = 0; }
+    if (*status == HAL_ERR_CANSessionMux_MessageNotFound) {fprintf(stderr, "Warning: CANLight with ID %d not found. Call to BlinkLED failed.\n", m_deviceID); *status = 0; }
 }
 
 void CANLightDriver::ShowRGB(uint8_t red, uint8_t green, uint8_t blue, int32_t* status) {
@@ -175,8 +176,8 @@ void CANLightDriver::ShowRGB(uint8_t red, uint8_t green, uint8_t blue, int32_t* 
 
     sendMessage(MS_API_COLOR_SET | m_deviceID, data, 4, status);
 
-    if (*status == ERR_CANSessionMux_MessageNotFound) {fprintf(stderr, "Warning: CANLight with ID %d not found. Call to ShowRGB failed.\n", m_deviceID); *status = 0; }
-    //std::cout << "ERR_CANSessionMux_MessageNotFound: " << ERR_CANSessionMux_MessageNotFound << "   status: " << *status << std::endl;
+    if (*status == HAL_ERR_CANSessionMux_MessageNotFound) {fprintf(stderr, "Warning: CANLight with ID %d not found. Call to ShowRGB failed.\n", m_deviceID); *status = 0; }
+    //std::cout << "HAL_ERR_CANSessionMux_MessageNotFound: " << HAL_ERR_CANSessionMux_MessageNotFound << "   status: " << *status << std::endl;
 }
 
 void CANLightDriver::WriteRegister(uint8_t index, uint8_t time, uint8_t red, uint8_t green, uint8_t blue, int32_t* status) {
@@ -191,7 +192,7 @@ void CANLightDriver::WriteRegister(uint8_t index, uint8_t time, uint8_t red, uin
 
     sendMessage(MS_API_COLOR_LOAD | m_deviceID, data, 5, status);
     
-    if (*status == ERR_CANSessionMux_MessageNotFound) {fprintf(stderr, "Warning: CANLight with ID %d not found. Call to WriteRegister failed.\n", m_deviceID); *status = 0; }
+    if (*status == HAL_ERR_CANSessionMux_MessageNotFound) {fprintf(stderr, "Warning: CANLight with ID %d not found. Call to WriteRegister failed.\n", m_deviceID); *status = 0; }
 }
 
 void CANLightDriver::Reset(int32_t* status) {
@@ -199,7 +200,7 @@ void CANLightDriver::Reset(int32_t* status) {
     
     sendMessage(MS_API_COLOR_RESET | m_deviceID, nullptr, 0, status);
     
-    if (*status == ERR_CANSessionMux_MessageNotFound) {fprintf(stderr, "Warning: CANLight with ID %d not found. Call to Reset failed.\n", m_deviceID); *status = 0; }
+    if (*status == HAL_ERR_CANSessionMux_MessageNotFound) {fprintf(stderr, "Warning: CANLight with ID %d not found. Call to Reset failed.\n", m_deviceID); *status = 0; }
 }
 
 void CANLightDriver::ShowRegister(uint8_t index, int32_t* status) {
@@ -210,7 +211,7 @@ void CANLightDriver::ShowRegister(uint8_t index, int32_t* status) {
 
     sendMessage(MS_API_COLOR_SHOW | m_deviceID, data, 1, status);
     
-    if (*status == ERR_CANSessionMux_MessageNotFound) {fprintf(stderr, "Warning: CANLight with ID %d not found. Call to ShowRegister failed.\n", m_deviceID); *status = 0; }
+    if (*status == HAL_ERR_CANSessionMux_MessageNotFound) {fprintf(stderr, "Warning: CANLight with ID %d not found. Call to ShowRegister failed.\n", m_deviceID); *status = 0; }
 }
 
 void CANLightDriver::Flash(uint8_t index, int32_t* status) {
@@ -221,7 +222,7 @@ void CANLightDriver::Flash(uint8_t index, int32_t* status) {
 
     sendMessage(MS_API_COLOR_BLINK | m_deviceID, data, 1, status);
     
-    if (*status == ERR_CANSessionMux_MessageNotFound) {fprintf(stderr, "Warning: CANLight with ID %d not found. Call to Flash failed.\n", m_deviceID); *status = 0; }
+    if (*status == HAL_ERR_CANSessionMux_MessageNotFound) {fprintf(stderr, "Warning: CANLight with ID %d not found. Call to Flash failed.\n", m_deviceID); *status = 0; }
 }
 
 void CANLightDriver::Cycle(uint8_t fromIndex, uint8_t toIndex, int32_t* status) {
@@ -233,7 +234,7 @@ void CANLightDriver::Cycle(uint8_t fromIndex, uint8_t toIndex, int32_t* status) 
 
     sendMessage(MS_API_COLOR_SWEEP | m_deviceID, data, 2, status);
     
-    if (*status == ERR_CANSessionMux_MessageNotFound) {fprintf(stderr, "Warning: CANLight with ID %d not found. Call to Cycle failed.\n", m_deviceID); *status = 0; }
+    if (*status == HAL_ERR_CANSessionMux_MessageNotFound) {fprintf(stderr, "Warning: CANLight with ID %d not found. Call to Cycle failed.\n", m_deviceID); *status = 0; }
 }
 
 void CANLightDriver::Fade(uint8_t startIndex, uint8_t endIndex, int32_t* status) {
@@ -245,7 +246,7 @@ void CANLightDriver::Fade(uint8_t startIndex, uint8_t endIndex, int32_t* status)
 
     sendMessage(MS_API_COLOR_FADE | m_deviceID, data, 2, status);
     
-    if (*status == ERR_CANSessionMux_MessageNotFound) {fprintf(stderr, "Warning: CANLight with ID %d not found. Call to Fade failed.\n", m_deviceID); *status = 0; }
+    if (*status == HAL_ERR_CANSessionMux_MessageNotFound) {fprintf(stderr, "Warning: CANLight with ID %d not found. Call to Fade failed.\n", m_deviceID); *status = 0; }
 }
 
 double CANLightDriver::GetBatteryVoltage(int32_t* status) {
@@ -255,7 +256,7 @@ double CANLightDriver::GetBatteryVoltage(int32_t* status) {
 
     getMessage(MSR_STATUS_DATA | m_deviceID, data, nullptr, status);
     
-    //if (*status == ERR_CANSessionMux_MessageNotFound) {fprintf(stderr, "Warning: CANLight with ID %d not found. Call to GetBatteryVoltage failed (returning 0.0).\n", m_deviceID); *status = 0; return 0.0; }
+    //if (*status == HAL_ERR_CANSessionMux_MessageNotFound) {fprintf(stderr, "Warning: CANLight with ID %d not found. Call to GetBatteryVoltage failed (returning 0.0).\n", m_deviceID); *status = 0; return 0.0; }
     
     if (*status != 0) { // if the message wasn't received... (maybe calling this function too fast)
         *status = 0; // don't throw exception, we handled it

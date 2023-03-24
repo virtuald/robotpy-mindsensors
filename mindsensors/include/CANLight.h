@@ -2,12 +2,9 @@
 
 #include <string>
 
-#include "Base.h"
-#include "ErrorBase.h"
-
 namespace mindsensors {
 
-class CANLight : public frc::ErrorBase {
+class CANLight {
 public:
     static std::string GetLibraryVersion();
     
@@ -34,6 +31,7 @@ public:
 
 private:
 	int m_handle;
+	int m_deviceID;
 };
 
 } // namespace mindsensors

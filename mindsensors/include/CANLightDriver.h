@@ -3,7 +3,7 @@
 #include "mindsensorsDriver.h"
 #include "can_light.h"
 
-#include "HAL/handles/IndexedHandleResource.h"
+#include <hal/handles/IndexedHandleResource.h>
 
 #include <chrono> /* for GetBatteryVoltage grace period */
 

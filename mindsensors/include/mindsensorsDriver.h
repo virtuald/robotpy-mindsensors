@@ -1,7 +1,8 @@
 #pragma once
 
 #include "can_mindsensors.h"
-#include "FRC_NetworkCommunication/CANSessionMux.h"
+// #include "FRC_NetworkCommunication/CANSessionMux.h"
+#include <hal/CAN.h>
 
 namespace mindsensors {
 

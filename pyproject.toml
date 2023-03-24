@@ -1,0 +1,43 @@
+[build-system]
+requires = [
+    "robotpy-build<2024.0.0,>=2023.0.1",
+    "wpilib<2024.0.0,>=2023.2.1.0",
+]
+
+[tool.robotpy-build]
+base_package = "mindsensors"
+
+[tool.robotpy-build.metadata]
+name = "robotpy-mindsensors"
+description = "Python wrapper for MindSensors CANLight"
+author = "RobotPy Development Team"
+author_email = "robotpy@googlegroups.com"
+url = "https://github.com/virtuald/robotpy-mindsensors"
+license = "BSD-3-Clause"
+install_requires = [
+    "wpilib<2024.0.0,>=2023.2.1.0",
+]
+
+
+[tool.robotpy-build.wrappers."mindsensors"]
+name = "mindsensors"
+depends = [
+    "wpilibc",
+    "wpilib_core",
+    "wpimath_cpp",
+    "wpimath_geometry",
+    "wpiHal",
+    "wpiutil",
+]
+
+sources = [
+    "mindsensors/src/CANLight.cpp",
+    "mindsensors/src/CANLightDriver.cpp",
+    "mindsensors/src/mindsensorsDriver.cpp",
+    "mindsensors/src/main.cpp",
+]
+
+generate = [
+    { CANLight = "CANLight.h" },
+]
+generation_data = "gen"
